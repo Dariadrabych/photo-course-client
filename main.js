@@ -1,6 +1,5 @@
 let token = null;
 
-// 🔗 Замінити це посилання на адресу твого Render-сервера:
 const BASE_URL = 'https://photo-course-server.onrender.com';
 
 async function login() {
