@@ -53,7 +53,7 @@ async function saveLesson() {
     const text = await res.text();
     if (res.ok) {
       alert('Урок збережено: ' + text);
-      lessonIdInput.value = ''; // очищення
+      lessonIdInput.value = '';
     } else {
       alert('Помилка: ' + text);
     }
@@ -90,18 +90,24 @@ async function loadLessons() {
     data.forEach(lesson => {
       let dateText = 'Невідома дата';
 
-      // Firestore timestamp
-      if (lesson.date && lesson.date.seconds) {
-        const dateObj = new Date(lesson.date.seconds * 1000);
-        dateText = dateObj.toLocaleString('uk-UA');
-      }
-
-      // ISO string (збережене як рядок)
-      if (typeof lesson.date === 'string') {
-        const parsed = new Date(lesson.date);
-        if (!isNaN(parsed)) {
-          dateText = parsed.toLocaleString('uk-UA');
+      try {
+        if (lesson.date && lesson.date._seconds) {
+          // Якщо об'єкт Timestamp з Firestore
+          const dateObj = new Date(lesson.date._seconds * 1000);
+          dateText = dateObj.toLocaleString('uk-UA');
+        } else if (lesson.date && lesson.date.seconds) {
+          // Альтернативне ім'я поля
+          const dateObj = new Date(lesson.date.seconds * 1000);
+          dateText = dateObj.toLocaleString('uk-UA');
+        } else if (typeof lesson.date === 'string') {
+          // Якщо збережено як рядок ISO
+          const parsed = new Date(lesson.date);
+          if (!isNaN(parsed)) {
+            dateText = parsed.toLocaleString('uk-UA');
+          }
         }
+      } catch (err) {
+        console.warn('Помилка формату дати:', err);
       }
 
       const li = document.createElement('li');
